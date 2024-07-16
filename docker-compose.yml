@@ -1,6 +1,6 @@
 version: '3'
 services:
-  web:
+  php-framework:
     build: .
     ports:
       - "8000:80"
