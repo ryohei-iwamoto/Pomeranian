@@ -7,6 +7,7 @@ abstract class Application
     protected $response;
     protected $session;
     protected $db_manager;
+    protected $login_action = array();
 
 
     public function __construct($debug=false)
@@ -104,6 +105,9 @@ abstract class Application
             $this->runAction($controller, $action, $params);
         } catch (HttpNotFoundException $e) {
             $this->render404page($e);
+        } catch (UnauthorizedActionException $e) {
+            list($controller, $action) = $this->login_action;
+            $this->runAction($controller, $action);
         }
 
         $this->response->send();
@@ -112,6 +116,8 @@ abstract class Application
     public function runAction($controller_name, $action, $params=array())
     {
         $controller_class = ucfirst($controller_name) . "Controller";
+        $controller = $this->findController($controller_class);
+
         if ($controller_name===false){
             throw new HttpNotFoundException($controller_class . " controller is not found.");
         }
